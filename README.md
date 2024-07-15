@@ -5,3 +5,7 @@ Cette application console permet de renommer tous les épisodes de Détective Co
 ## Exemple
 
 `Détective Conan Épisode 0001.mkv` devient `Détective Conan Épisode 0001 - Le Plus Grand Détective du siècle.mkv`
+
+## TODO
+
+- [ ] Convertir le fichier `DetectiveConanTitre.txt` en fichier JSON pour une meilleure maniabilité.
