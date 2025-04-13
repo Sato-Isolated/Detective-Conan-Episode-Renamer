@@ -1,0 +1,57 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Déclenche sur les tags commençant par 'v'
+
+jobs:
+  build:
+    runs-on: windows-latest # Windows car c'est une application .NET
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x' # Version .NET de votre projet
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Publish Windows
+      run: dotnet publish --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true --output ./publish/win-x64
+    
+    - name: Create ZIP archive
+      run: |
+        cd publish/win-x64
+        7z a -tzip ../../DetectiveConanRenamer-win-x64.zip *
+        cd ../..
+    
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: DetectiveConanRenamer-win-x64.zip
+        name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        body: |
+          ## Detective Conan Episode Renamer ${{ github.ref_name }}
+          
+          ### Changements majeurs
+          - Migration vers le format YAML pour les données
+          - Ajout du système de build automatisé
+          - Nouvelle structure de projet avec séparation des interfaces, modèles et services
+          - Amélioration de la gestion des fichiers de configuration
+          
+          ### Installation
+          1. Téléchargez le fichier ZIP
+          2. Extrayez le contenu où vous voulez
+          3. Lancez DetectiveConanRenamer.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
